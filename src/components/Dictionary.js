@@ -1,48 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
-import { fetchFail, FETCH_FAIL, getPerson} from './../actions';
+import { fetchFail, FETCH_FAIL, getWord } from './../actions';
 
 import axios from 'axios';
 
-const Dictionary = ({ dictionary, isFetching, error,  dispatch }) => {
+ 
 
-  useEffect(()=> {
-    dispatch(getDictionary());
-  }, []);
+ const Dictionary = ({ word, isFetching, error, dispatch}) => {
+    
+    const [data, setData] = useState('');
+    const [searchWord, setSearchWord] = useState('');
 
-  if (error) {
-    return <h2>We got an error: {error}</h2>;
-  }
-
-  if (isFetching) {
-    return <h2>Fetching person for ya!</h2>;
-  }
-
-  const handleClick = () => {
-    dispatch(getDictionary());
-  }
-
-  return (
-    <>
-      <div>
-        <h2>Say Hi to: {dictionary.name} {person.name.last}</h2>
-        <img src={person.picture.large}/>
-      </div>
-      <button onClick={handleClick}>Get new person</button>
-      <button onClick={()=> {
-        dispatch(fetchFail("Error Triggered"));
-      }}>Trigger an error</button>
-    </>
-  );
-};
-
-const mapStateToProps = state => {
-  return {
-    person: state.person,
-    isFetching: state.isFetching,
-    error: state.error
+    const getMeaning = () => {
+        axios.get('https://api.dictionaryapi.dev/api/v2/entries/en/<word>')
+          .then(resp => {
+            dispatch(fetchSuccess(resp.data.results[0]))
+          })
+          .catch(err => {
+              dispatch(fetchFail(err))
+          })
+      }
+     
+      return (
+        <div className="App">
+          <h1>Dictionary App</h1>
+          <div className='search-box'>
+            <input 
+              type='text'
+              placeholder='Word'
+              onChange={(e) => {
+                setSearchWord(e.target.value)
+              }}
+            />
+            <br/>
+            <button onClick={ () => { getMeaning() }}>Search</button>
+          </div>
+       </div>
+      );
+ }
+ 
+ const mapStateToProps = state => {
+    return {
+      word: state.word,
+      isFetching: state.isFetching,
+      error: state.error
+    };
   };
-};
-
-export default connect(mapStateToProps)(Dictionary);
+  
+  export default connect(mapStateToProps)(Dictionary);

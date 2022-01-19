@@ -5,7 +5,7 @@ export const FETCH_SUCCESS = "FETCH_SUCCESS";
 export const FETCH_FAIL = "FETCH_FAIL";
 
 
-export const getPerson = () => (dispatch) => {
+export const getWord = () => (dispatch) => {
     dispatch(fetchStart());
     axios.get('https://api.dictionaryapi.dev/api/v2/entries/en/<word>')
         .then(resp => {
